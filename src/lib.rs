@@ -3,18 +3,12 @@ use serde::Deserialize;
 #[derive(Debug)]
 pub struct Config {
     // TODO: replace `String` with `&str`
+    config_path: String,
     filename: String,
-    config_directory: ConfigDirecrtory,
-    file_type: FileType 
+    filetype: FileType 
 }
 
-#[derive(Debug)]
-pub struct ConfigDirecrtory {
-    path: String,
-    name: String
-}
-
-// TODO: Derive the `Default` trait for the `Config` and `ConfigDirectory` struct:
+// TODO: Derive the `Default` trait for the `Config` struct:
 //       Default `Config`: filename = base/ default; config_path = process.cwd; config_dir = config
 
 // TODO: Alternatively, allow the user to build the config struct via builder pattern
