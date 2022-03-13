@@ -32,7 +32,7 @@ impl TryFrom<PathBuf> for FileType {
                 _ => Err("Unsupported FileType".to_string()),
             }
         } else {
-            Err("Not file detected".to_string())
+            Err("No file detected".to_string())
         }
     }
 }
