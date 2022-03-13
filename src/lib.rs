@@ -3,10 +3,15 @@ use std::path::PathBuf;
 
 use serde::Deserialize;
 
+mod parser;
+
+pub use parser::json::parse_json;
+pub use parser::yaml::parse_yaml;
+
 #[derive(Debug)]
 pub struct Config {
     pub config_path: PathBuf,
-    filetype: FileType,
+    pub(crate) filetype: FileType,
 }
 
 // TODO: Derive the `Default` trait for the `Config` struct:
@@ -22,9 +27,13 @@ pub enum FileType {
 }
 
 impl FileType {
-    #[allow(unused)]
-    pub fn parse<'a, T: Deserialize<'a>>(s: &str) -> T {
-        todo!()
+    pub fn parse<'a, T: Deserialize<'a>>(self, s: &str, file_path: &PathBuf) -> T {
+        // TODO: Add regex to validate string path `s`
+        let file_content = std::fs::read_to_string(file_path).unwrap();
+        match self {
+            FileType::Json => parse_json(file_content, s),
+            FileType::Yaml => parse_yaml(file_content, s)
+        }
     }
 }
 
@@ -127,14 +136,11 @@ impl Config {
         }
     }
 
-    #[allow(unused)]
     pub fn get<'a, T: Deserialize<'a>>(s: String) -> T {
-        // it looks like parsin should be calling `self.file_type.parse(s)`
-
-        // On parsing, check custom formatted string (structure TBD, but this is just an example)
-        // matches `${{ENV_VAR_NAME}}`, and instead of passing this as the value, read from the
-        // environmental variable name provided
-        todo!()
+        let config_instance = Config::build();
+        config_instance
+            .filetype
+            .parse(&s, &config_instance.config_path)
     }
 }
 
