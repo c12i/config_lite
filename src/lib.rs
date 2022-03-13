@@ -1,8 +1,6 @@
 use std::convert::TryFrom;
 use std::path::PathBuf;
 
-use serde::Deserialize;
-
 mod parser;
 
 pub use parser::json::parse_json;
@@ -21,11 +19,11 @@ pub enum FileType {
 }
 
 impl<'a> FileType {
-    pub fn parse<T: serde::Deserialize<'a>> (self, s: &str, file_path: &PathBuf) -> T {
+    pub fn parse<T: for<'de> serde::Deserialize<'de>>(self, s: &str, file_path: &PathBuf) -> T {
         // TODO: Add regex to validate string path `s`
         match self {
             FileType::Json => parse_json(file_path, s),
-            FileType::Yaml => parse_yaml(file_path, s)
+            FileType::Yaml => parse_yaml(file_path, s),
         }
     }
 }
@@ -104,11 +102,11 @@ impl Config {
         }
     }
 
-    pub fn get<'a, T: Deserialize<'a>>(s: String) -> T {
+    pub fn get<'a, T: for<'de> serde::Deserialize<'de>>(s: &'a str) -> T {
         let config_instance = Config::build();
         config_instance
             .filetype
-            .parse(&s, &config_instance.config_file_path)
+            .parse(s, &config_instance.config_file_path)
     }
 }
 
