@@ -20,13 +20,12 @@ pub enum FileType {
     Yaml,
 }
 
-impl FileType {
-    pub fn parse<'a, T: Deserialize<'a>>(self, s: &str, file_path: &PathBuf) -> T {
+impl<'a> FileType {
+    pub fn parse<T: serde::Deserialize<'a>> (self, s: &str, file_path: &PathBuf) -> T {
         // TODO: Add regex to validate string path `s`
-        let file_content = std::fs::read_to_string(file_path).unwrap();
         match self {
-            FileType::Json => parse_json(file_content, s),
-            FileType::Yaml => parse_yaml(file_content, s)
+            FileType::Json => parse_json(file_path, s),
+            FileType::Yaml => parse_yaml(file_path, s)
         }
     }
 }
