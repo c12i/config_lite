@@ -10,7 +10,7 @@ pub use parser::yaml::parse_yaml;
 
 #[derive(Debug)]
 pub struct Config {
-    pub config_path: PathBuf,
+    pub config_file_path: PathBuf,
     pub(crate) filetype: FileType,
 }
 
@@ -70,10 +70,10 @@ impl Config {
             .map(|v| v.unwrap().path())
             .collect::<Vec<PathBuf>>();
         println!("{:#?}", res);
-        let file = res.iter().next().unwrap();
+        let config_file_path = res.iter().next().unwrap();
         Config {
-            filetype: FileType::try_from(file.to_owned()).unwrap(),
-            config_path: file.to_owned(),
+            filetype: FileType::try_from(config_file_path.to_owned()).unwrap(),
+            config_file_path: config_file_path.to_owned(),
         }
     }
 
@@ -110,7 +110,7 @@ impl Config {
         let config_instance = Config::build();
         config_instance
             .filetype
-            .parse(&s, &config_instance.config_path)
+            .parse(&s, &config_instance.config_file_path)
     }
 }
 
