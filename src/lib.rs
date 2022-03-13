@@ -64,10 +64,6 @@ impl Config {
     }
 
     pub fn get<'a, T: for<'de> serde::Deserialize<'de>>(&self, s: &'a str) -> T {
-        self.parse(s)
-    }
-
-    fn parse<T: for<'de> serde::Deserialize<'de>>(&self, s: &str) -> T {
         // TODO: Add regex to validate string path `s`
         match self.filetype {
             FileType::Json => parse_json(&self.file_content, s),
@@ -105,10 +101,3 @@ impl Config {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
