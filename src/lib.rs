@@ -1,11 +1,12 @@
+use std::convert::TryFrom;
+use std::path::PathBuf;
+
 use serde::Deserialize;
 
 #[derive(Debug)]
 pub struct Config {
-    // TODO: replace `String` with `&str`
-    config_path: String,
-    filename: String,
-    filetype: FileType 
+    pub config_path: PathBuf,
+    filetype: FileType,
 }
 
 // TODO: Derive the `Default` trait for the `Config` struct:
@@ -17,12 +18,32 @@ pub struct Config {
 #[derive(Debug)]
 pub enum FileType {
     Json,
-    Yaml
+    Yaml,
 }
 
 impl FileType {
+    #[allow(unused)]
     pub fn parse<'a, T: Deserialize<'a>>(s: &str) -> T {
         todo!()
+    }
+}
+
+impl TryFrom<PathBuf> for FileType {
+    // TODO: Replace with custom error type
+    type Error = String;
+
+    fn try_from(p: PathBuf) -> Result<Self, Self::Error> {
+        if let Some(s) = p.extension() {
+            // TODO: Handle error
+            let s = s.to_str().unwrap();
+            match s {
+                "json" => Ok(FileType::Json),
+                "yaml" | "yml" => Ok(FileType::Yaml),
+                _ => Err("Unsupported FileType".to_string()),
+            }
+        } else {
+            Err("Not file detected".to_string())
+        }
     }
 }
 
@@ -47,20 +68,72 @@ impl Config {
             in. There should be an option to however change this behaviour if needed, i.e
             - setting the path as an arg while building `Config`
             - reading from an environmental vaiable `CONFIG_LITE_DIR`
-        */ 
+        */
         todo!()
     }
 
+    pub fn build() -> Self {
+        let filename = Config::get_current_configuration_environment();
+        let config_path = Config::get_config_path();
+        let res = std::fs::read_dir(config_path)
+            .unwrap()
+            .filter(|d| {
+                d.as_ref()
+                    .unwrap()
+                    .file_name()
+                    .into_string()
+                    .unwrap()
+                    .split(".")
+                    .next()
+                    .unwrap()
+                    == filename
+            })
+            .map(|v| v.unwrap().path())
+            .collect::<Vec<PathBuf>>();
+        println!("{:#?}", res);
+        let file = res.iter().next().unwrap();
+        Config {
+            filetype: FileType::try_from(file.to_owned()).unwrap(),
+            config_path: file.to_owned(),
+        }
+    }
+
+    fn get_config_path() -> PathBuf {
+        let path = {
+            if let Ok(value) = std::env::var("CONFIG_LITE_DIR_PATH") {
+                let mut path_buf = PathBuf::new();
+                path_buf.push(value);
+                path_buf.push(Config::get_config_directory_name());
+                return path_buf;
+            }
+            let mut config_path = std::env::current_dir().unwrap();
+            config_path.push(Config::get_config_directory_name());
+            config_path
+        };
+        path
+    }
+
+    fn get_current_configuration_environment() -> String {
+        match std::env::var("CONFIG_LITE_ENV") {
+            Ok(var) => var,
+            Err(_) => "default".to_string(),
+        }
+    }
+
+    fn get_config_directory_name() -> String {
+        match std::env::var("CONFIG_LITE_DIRECTORY_NAME") {
+            Ok(var) => var,
+            Err(_) => "config".to_string(),
+        }
+    }
+
+    #[allow(unused)]
     pub fn get<'a, T: Deserialize<'a>>(s: String) -> T {
         // it looks like parsin should be calling `self.file_type.parse(s)`
 
         // On parsing, check custom formatted string (structure TBD, but this is just an example)
         // matches `${{ENV_VAR_NAME}}`, and instead of passing this as the value, read from the
         // environmental variable name provided
-        todo!()
-    }
-
-    fn read_from_env_var<'a, T: Deserialize<'a>>() -> T  {
         todo!()
     }
 }
