@@ -69,7 +69,6 @@ impl Config {
             })
             .map(|v| v.unwrap().path())
             .collect::<Vec<PathBuf>>();
-        println!("{:#?}", res);
         let config_file_path = res.iter().next().unwrap();
         Config {
             filetype: FileType::try_from(config_file_path.to_owned()).unwrap(),
