@@ -38,7 +38,7 @@ impl TryFrom<PathBuf> for FileType {
 }
 
 impl Config {
-    pub fn build() -> Self {
+    pub fn new() -> Self {
         let filename = Config::get_current_configuration_environment();
         let config_path = Config::get_config_path();
         let res = std::fs::read_dir(config_path)
@@ -60,6 +60,18 @@ impl Config {
         Config {
             filetype: FileType::try_from(config_file_path.to_owned()).unwrap(),
             file_content: std::fs::read_to_string(config_file_path).unwrap(),
+        }
+    }
+
+    pub fn get<'a, T: for<'de> serde::Deserialize<'de>>(&self, s: &'a str) -> T {
+        self.parse(s)
+    }
+
+    fn parse<T: for<'de> serde::Deserialize<'de>>(&self, s: &str) -> T {
+        // TODO: Add regex to validate string path `s`
+        match self.filetype {
+            FileType::Json => parse_json(&self.file_content, s),
+            FileType::Yaml => parse_yaml(&self.file_content, s),
         }
     }
 
@@ -89,19 +101,6 @@ impl Config {
         match std::env::var("CONFIG_LITE_DIRECTORY_NAME") {
             Ok(var) => var,
             Err(_) => "config".to_string(),
-        }
-    }
-
-    pub fn get<'a, T: for<'de> serde::Deserialize<'de>>(s: &'a str) -> T {
-        let config_instance = Config::build();
-        config_instance.parse(s)
-    }
-
-    pub fn parse<T: for<'de> serde::Deserialize<'de>>(&self, s: &str) -> T {
-        // TODO: Add regex to validate string path `s`
-        match self.filetype {
-            FileType::Json => parse_json(&self.file_content, s),
-            FileType::Yaml => parse_yaml(&self.file_content, s),
         }
     }
 }
