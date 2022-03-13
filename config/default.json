@@ -1,7 +1,9 @@
 {
 	"foo": "bar",
-	"nested": {
-		"foo": true,
-		"bar": "hello"
+	"user": {
+		"id": 1,
+		"name": "Foo Baz",
+		"screen_name": "foo_baz",
+		"isActive": true
 	}
 }

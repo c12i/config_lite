@@ -1,6 +1,7 @@
 use std::convert::TryFrom;
 use std::path::PathBuf;
 
+mod error;
 mod parser;
 
 pub use parser::json::parse_json;
