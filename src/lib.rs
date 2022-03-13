@@ -8,24 +8,14 @@ pub use parser::yaml::parse_yaml;
 
 #[derive(Debug)]
 pub struct Config {
-    pub config_file_path: PathBuf,
     pub(crate) filetype: FileType,
+    pub file_content: String,
 }
 
 #[derive(Debug)]
 pub enum FileType {
     Json,
     Yaml,
-}
-
-impl<'a> FileType {
-    pub fn parse<T: for<'de> serde::Deserialize<'de>>(self, s: &str, file_path: &PathBuf) -> T {
-        // TODO: Add regex to validate string path `s`
-        match self {
-            FileType::Json => parse_json(file_path, s),
-            FileType::Yaml => parse_yaml(file_path, s),
-        }
-    }
 }
 
 impl TryFrom<PathBuf> for FileType {
@@ -69,7 +59,7 @@ impl Config {
         let config_file_path = res.iter().next().unwrap();
         Config {
             filetype: FileType::try_from(config_file_path.to_owned()).unwrap(),
-            config_file_path: config_file_path.to_owned(),
+            file_content: std::fs::read_to_string(config_file_path).unwrap(),
         }
     }
 
@@ -104,9 +94,15 @@ impl Config {
 
     pub fn get<'a, T: for<'de> serde::Deserialize<'de>>(s: &'a str) -> T {
         let config_instance = Config::build();
-        config_instance
-            .filetype
-            .parse(s, &config_instance.config_file_path)
+        config_instance.parse(s)
+    }
+
+    pub fn parse<T: for<'de> serde::Deserialize<'de>>(&self, s: &str) -> T {
+        // TODO: Add regex to validate string path `s`
+        match self.filetype {
+            FileType::Json => parse_json(&self.file_content, s),
+            FileType::Yaml => parse_yaml(&self.file_content, s),
+        }
     }
 }
 
