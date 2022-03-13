@@ -1,3 +1,7 @@
 {
-	"test": "foo"
+	"foo": "bar",
+	"nested": {
+		"foo": true,
+		"bar": "hello"
+	}
 }

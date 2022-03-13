@@ -72,15 +72,16 @@ impl Config {
     }
 
     fn get_config_path() -> PathBuf {
+        let config_directory_name = Config::get_config_directory_name();
         let path = {
             if let Ok(value) = std::env::var("CONFIG_LITE_DIR_PATH") {
                 let mut path_buf = PathBuf::new();
                 path_buf.push(value);
-                path_buf.push(Config::get_config_directory_name());
+                path_buf.push(config_directory_name);
                 return path_buf;
             }
             let mut config_path = std::env::current_dir().unwrap();
-            config_path.push(Config::get_config_directory_name());
+            config_path.push(config_directory_name);
             config_path
         };
         path
@@ -100,4 +101,3 @@ impl Config {
         }
     }
 }
-
