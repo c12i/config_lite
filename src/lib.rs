@@ -3,9 +3,11 @@ use std::path::PathBuf;
 
 mod error;
 mod parser;
+mod utils;
 
-pub use parser::json::parse_json;
-pub use parser::yaml::parse_yaml;
+use parser::json::parse_json;
+use parser::yaml::parse_yaml;
+use utils::{get_config_path, get_current_configuration_environment};
 
 #[derive(Debug)]
 pub struct Config {
@@ -40,8 +42,8 @@ impl TryFrom<PathBuf> for FileType {
 
 impl Config {
     pub fn new() -> Self {
-        let filename = Config::get_current_configuration_environment();
-        let config_path = Config::get_config_path();
+        let filename = get_current_configuration_environment();
+        let config_path = get_config_path();
         let res = std::fs::read_dir(config_path)
             .unwrap()
             .filter(|d| {
@@ -69,36 +71,6 @@ impl Config {
         match self.filetype {
             FileType::Json => parse_json(&self.file_content, s),
             FileType::Yaml => parse_yaml(&self.file_content, s),
-        }
-    }
-
-    fn get_config_path() -> PathBuf {
-        let config_directory_name = Config::get_config_directory_name();
-        let path = {
-            if let Ok(value) = std::env::var("CONFIG_LITE_DIR_PATH") {
-                let mut path_buf = PathBuf::new();
-                path_buf.push(value);
-                path_buf.push(config_directory_name);
-                return path_buf;
-            }
-            let mut config_path = std::env::current_dir().unwrap();
-            config_path.push(config_directory_name);
-            config_path
-        };
-        path
-    }
-
-    fn get_current_configuration_environment() -> String {
-        match std::env::var("CONFIG_LITE_ENV") {
-            Ok(var) => var,
-            Err(_) => "default".to_string(),
-        }
-    }
-
-    fn get_config_directory_name() -> String {
-        match std::env::var("CONFIG_LITE_DIRECTORY_NAME") {
-            Ok(var) => var,
-            Err(_) => "config".to_string(),
         }
     }
 }
