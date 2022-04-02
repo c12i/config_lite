@@ -2,9 +2,9 @@ use config_lite::Config;
 use serde::Deserialize;
 
 #[test]
-fn file_content_is_saved_into_config_struct() {
+fn yaml_file_content_is_saved_into_config_struct() {
     let config = Config::new();
-    let actual_file_content = std::fs::read_to_string("./config/default.json").unwrap();
+    let actual_file_content = std::fs::read_to_string("./config/default.yaml").unwrap();
     assert_eq!(config.file_content, actual_file_content);
 }
 
@@ -18,7 +18,7 @@ struct User {
 }
 
 #[test]
-fn get_value_from_config_file() {
+fn get_value_from_yaml_config_file() {
     let config = Config::new();
     let val = config.get::<String>("foo");
     assert_eq!(val, "bar".to_string());
@@ -31,6 +31,7 @@ fn get_value_from_config_file() {
         is_active: true,
     };
     println!("{:?}", config_user);
+    assert_eq!(1,1);
     assert_eq!(config_user.id, actual_user.id);
     assert_eq!(config_user.name, actual_user.name);
     assert_eq!(config_user.screen_name, actual_user.screen_name);
