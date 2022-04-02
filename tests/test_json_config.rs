@@ -21,12 +21,13 @@ struct User {
 }
 
 #[test]
-fn get_value_from_yaml_config_file() {
+fn get_value_from_json_config_file() {
+		env::set_var("CONFIG_LITE_ENV", "test");
     let config = Config::new();
     let val = config.get::<String>("foo");
     assert_eq!(val, "bar".to_string());
 
-    let config_user = config.get::<User>("user");
+    let config_user = config.get::<User>("test.user");
     let actual_user = User {
         id: 1,
         name: "Foo Baz".to_string(),
@@ -39,4 +40,5 @@ fn get_value_from_yaml_config_file() {
     assert_eq!(config_user.name, actual_user.name);
     assert_eq!(config_user.screen_name, actual_user.screen_name);
     assert_eq!(config_user.is_active, actual_user.is_active);
+		env::remove_var("CONFIG_LITE_ENV")
 }

@@ -1,9 +1,11 @@
 {
 	"foo": "bar",
-	"user": {
-		"id": 1,
-		"name": "Foo Baz",
-		"screen_name": "foo_baz",
-		"isActive": true
+	"test": {
+		"user": {
+			"id": 1,
+			"name": "Foo Baz",
+			"screen_name": "foo_baz",
+			"isActive": true
+		}
 	}
 }
