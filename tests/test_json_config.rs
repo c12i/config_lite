@@ -1,11 +1,14 @@
 use config_lite::Config;
 use serde::Deserialize;
+use std::env;
 
 #[test]
-fn yaml_file_content_is_saved_into_config_struct() {
+fn json_file_content_is_saved_into_config_struct() {
+    env::set_var("CONFIG_LITE_ENV", "test");
     let config = Config::new();
-    let actual_file_content = std::fs::read_to_string("./config/default.yaml").unwrap();
+    let actual_file_content = std::fs::read_to_string("./config/test.json").unwrap();
     assert_eq!(config.file_content, actual_file_content);
+    env::remove_var("CONFIG_LITE_ENV")
 }
 
 #[derive(Deserialize, Debug)]
@@ -31,7 +34,7 @@ fn get_value_from_yaml_config_file() {
         is_active: true,
     };
     println!("{:?}", config_user);
-    assert_eq!(1,1);
+    assert_eq!(1, 1);
     assert_eq!(config_user.id, actual_user.id);
     assert_eq!(config_user.name, actual_user.name);
     assert_eq!(config_user.screen_name, actual_user.screen_name);
