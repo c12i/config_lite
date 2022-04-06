@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use std::convert::TryFrom;
 use std::path::PathBuf;
 
@@ -5,9 +6,12 @@ mod error;
 mod parser;
 mod utils;
 
+pub use error::ConfigError;
 use parser::json::parse_json;
 use parser::yaml::parse_yaml;
 use utils::{get_config_path, get_current_configuration_environment};
+
+type ConfigResult<T> = Result<T, ConfigError>;
 
 #[derive(Debug)]
 pub struct Config {
@@ -23,50 +27,60 @@ pub enum FileType {
 
 impl TryFrom<PathBuf> for FileType {
     // TODO: Replace with custom error type
-    type Error = String;
+    type Error = ConfigError;
 
     fn try_from(p: PathBuf) -> Result<Self, Self::Error> {
         if let Some(s) = p.extension() {
             // TODO: Handle error
-            let s = s.to_str().unwrap();
+            let s = s
+                .to_str()
+                .ok_or_else(|| ConfigError::Other(anyhow!("error converting OsStr to &str")))?;
             match s {
                 "json" => Ok(FileType::Json),
                 "yaml" | "yml" => Ok(FileType::Yaml),
-                _ => Err("Unsupported FileType".to_string()),
+                _ => Err(ConfigError::UnsupportedFileTypeError),
             }
         } else {
-            Err("No file detected".to_string())
+            Err(ConfigError::FileNotFoundError)
         }
     }
 }
 
 impl Config {
-    pub fn new() -> Self {
+    pub fn new() -> ConfigResult<Self> {
         let filename = get_current_configuration_environment();
         let config_path = get_config_path();
-        let res = std::fs::read_dir(config_path)
-            .unwrap()
+        let res = std::fs::read_dir(config_path)?
             .filter(|d| {
-                d.as_ref()
+                // TODO: Prefarably use a fallible iterator
+                let value = d
+                    .as_ref()
                     .unwrap()
                     .file_name()
                     .into_string()
-                    .unwrap()
+                    .unwrap_or_else(|_| "".to_string())
                     .split(".")
                     .next()
-                    .unwrap()
-                    == filename
+                    .unwrap_or_else(|| "")
+                    .to_owned();
+                value == filename
             })
-            .map(|v| v.unwrap().path())
-            .collect::<Vec<PathBuf>>();
-        let config_file_path = res.iter().next().unwrap();
-        Config {
-            filetype: FileType::try_from(config_file_path.to_owned()).unwrap(),
-            file_content: std::fs::read_to_string(config_file_path).unwrap(),
-        }
+            .map(|v| v)
+            .collect::<Vec<_>>();
+        let config_file_path = res
+            .iter()
+            .next()
+            .ok_or_else(|| ConfigError::FileNotFoundError)?
+            .as_ref()
+            .map_err(|_| ConfigError::FileNotFoundError)?
+            .path();
+        Ok(Config {
+            filetype: FileType::try_from(config_file_path.to_owned())?,
+            file_content: std::fs::read_to_string(config_file_path)?,
+        })
     }
 
-    pub fn get<'a, T: for<'de> serde::Deserialize<'de>>(&self, s: &'a str) -> T {
+    pub fn get<'a, T: for<'de> serde::Deserialize<'de>>(&self, s: &'a str) -> ConfigResult<T> {
         // TODO: Add regex to validate string path `s`
         match self.filetype {
             FileType::Json => parse_json(&self.file_content, s),

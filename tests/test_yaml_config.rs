@@ -3,7 +3,7 @@ use serde::Deserialize;
 
 #[test]
 fn yaml_file_content_is_saved_into_config_struct() {
-    let config = Config::new();
+    let config = Config::new().unwrap();
     let actual_file_content = std::fs::read_to_string("./config/default.yaml").unwrap();
     assert_eq!(config.file_content, actual_file_content);
 }
@@ -19,11 +19,11 @@ struct User {
 
 #[test]
 fn get_value_from_yaml_config_file() {
-    let config = Config::new();
-    let val = config.get::<String>("foo");
+    let config = Config::new().unwrap();
+    let val = config.get::<String>("foo").unwrap();
     assert_eq!(val, "bar".to_string());
 
-    let config_user = config.get::<User>("user");
+    let config_user = config.get::<User>("user").unwrap();
     let actual_user = User {
         id: 1,
         name: "Foo Baz".to_string(),
