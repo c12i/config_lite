@@ -3,6 +3,7 @@ use std::path::PathBuf;
 pub fn get_config_path() -> PathBuf {
     let config_directory_name = get_config_directory_name();
     let path = {
+        // TODO: Find out why setting this env var doens't work
         if let Ok(value) = std::env::var("CONFIG_LITE_DIR_PATH") {
             let mut path_buf = PathBuf::new();
             path_buf.push(value);
