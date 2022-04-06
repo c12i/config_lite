@@ -37,3 +37,10 @@ fn get_value_from_yaml_config_file() {
     assert_eq!(config_user.screen_name, actual_user.screen_name);
     assert_eq!(config_user.is_active, actual_user.is_active);
 }
+
+#[test]
+fn get_array_values_from_yaml_config_file() {
+    let config = Config::new().unwrap();
+    let values = config.get::<[i32;2]>("array").unwrap();
+    assert_eq!([2,1], values);
+}

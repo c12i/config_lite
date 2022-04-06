@@ -4,3 +4,6 @@ user:
   name: Foo Baz
   screen_name: foo_baz
   isActive: true
+array:
+  - 2
+  - 1

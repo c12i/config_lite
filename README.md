@@ -3,17 +3,45 @@
 A lightweight and customizable configuration management library for binary crates. Inspired by [node config](https://www.npmjs.com/package/config)
 
 ### Caveats
-The values read from the configuration files must be owned, meaning they cannot be deserialized into reference types
+The values read from the configuration files must be owned, meaning they cannot be deserialized with [serde](https://github.com/serde-rs/serde) into reference types
 
 Still a work in progress
 
 ## Example
 
+Given the following json config file:
+
+```json
+{
+  "foo": "bar",
+  "test": {
+   "user": {
+      "id": 1,
+      "name": "Foo Baz",
+      "screen_name": "foo_baz",
+      "isActive": true
+    }
+  }
+}
+```
+
+The configurations can be read like so:
+
 ```rust
 use config::Config;
+use serde::Deserialize;
+
+#[derive(Deserialize, Debug)]
+struct User {
+  id: u32,
+  name: String,
+  screen_name: String,
+  #[serde(rename(deserialize = "isActive"))]
+  is_active: bool,
+}
 
 let config = Config::new()?;
 
-let value = config.get<String>("value")?;
-let user = config.get<User>("value.user")?;
+let value = config.get<String>("foo")?;
+let user = config.get<User>("test.user")?;
 ```
