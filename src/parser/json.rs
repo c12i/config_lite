@@ -18,15 +18,18 @@ pub fn parse_json<'a, T: for<'de> serde::Deserialize<'de>>(
     // check if current value is a string and if the string matches a {{}} regex pattern
     if current_value.is_string() {
         let re = Regex::new(r"\{\{(\w+)\}\}").unwrap();
+        // handle Value to &str conversion error
         let value_string = current_value.as_str().unwrap();
         match re.captures(value_string) {
             Some(c) => {
+                // return Err if therer are no matches
                 let env_var_name = c.get(1).unwrap().as_str();
+                // handle error getting env vars
                 let value = env::var(env_var_name).unwrap();
                 let value = serde_json::Value::String(value);
                 return Ok(serde_json::from_value(value)?);
             },
-            None => {/*TODO: throw error*/ unimplemented!()}
+            None => {/*TODO: return Err */ unimplemented!()}
         }
     }
     Ok(serde_json::from_value(current_value.to_owned())?)
