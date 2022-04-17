@@ -42,3 +42,15 @@ fn get_value_from_json_config_file() {
     assert_eq!(config_user.is_active, actual_user.is_active);
     env::remove_var("CONFIG_LITE_ENV")
 }
+
+#[test]
+fn get_configuration_value_from_env_var() {
+    env::set_var("CONFIG_LITE_ENV", "test");
+    env::set_var("DATABASE_PASSWORD", "123test");
+    let config = Config::new().unwrap();
+    let val = config.get::<String>("database.password").unwrap();
+    println!("config password ==> {}", val);
+    assert_eq!(val, "123test".to_string());
+    env::remove_var("DATABASE_PASSWORD");
+    env::remove_var("CONFIG_LITE_ENV")
+}
