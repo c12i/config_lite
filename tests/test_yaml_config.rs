@@ -1,3 +1,5 @@
+use std::env;
+
 use config_lite::Config;
 use serde::Deserialize;
 
@@ -43,4 +45,14 @@ fn get_array_values_from_yaml_config_file() {
     let config = Config::new().unwrap();
     let values = config.get::<[i32; 2]>("array").unwrap();
     assert_eq!([2, 1], values);
+}
+
+#[test]
+fn get_yaml_configuration_value_from_env_var() {
+    env::set_var("DATABASE_PASSWORD", "123test");
+    let config = Config::new().unwrap();
+    let val = config.get::<String>("database.password").unwrap();
+    println!("config password ==> {}", val);
+    assert_eq!(val, "123test".to_string());
+    env::remove_var("DATABASE_PASSWORD");
 }
