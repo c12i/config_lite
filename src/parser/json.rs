@@ -20,16 +20,18 @@ pub fn parse_json<'a, T: for<'de> serde::Deserialize<'de>>(
         if let Some(value_string) = current_value.as_str() {
             // not expected to fail
             let re = Regex::new(r"\{\{(\w+)\}\}").unwrap();
-            if let Some(c) = re.captures(value_string) {
-                // return Err if therer are no matches
-                let env_var_name = c
-                    .get(1)
-                    .ok_or_else(|| ConfigError::RegexError(value_string.to_string()))?
-                    .as_str();
-                // handle error getting env vars
-                let value = env::var(env_var_name)?;
-                let value = serde_json::Value::String(value);
-                return Ok(serde_json::from_value(value)?);
+            match re.captures(value_string) {
+                Some(c) => {
+                    let env_var_name = c
+                        .get(1)
+                        .ok_or_else(|| ConfigError::RegexError(value_string.to_string()))?
+                        .as_str();
+                    // handle error getting env vars
+                    let value = env::var(env_var_name)?;
+                    let value = serde_json::Value::String(value);
+                    return Ok(serde_json::from_value(value)?);
+                },
+                None => return Err(ConfigError::RegexError(value_string.to_string()))
             }
         }
     }
