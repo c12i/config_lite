@@ -11,6 +11,15 @@ fn json_file_content_is_saved_into_config_struct() {
     env::remove_var("CONFIG_LITE_ENV")
 }
 
+#[test]
+#[should_panic]
+fn invalid_string_path_results_in_an_error() {
+    env::set_var("CONFIG_LITE_ENV", "test");
+    let config = Config::new().unwrap();
+    let _ = config.get::<String>("test:user:name").unwrap();
+    env::remove_var("CONFIG_LITE_ENV");
+}
+
 #[derive(Deserialize, Debug)]
 struct User {
     id: u32,
@@ -44,7 +53,7 @@ fn get_value_from_json_config_file() {
 }
 
 #[test]
-fn get_configuration_value_from_env_var() {
+fn get_json_configuration_value_from_env_var() {
     env::set_var("CONFIG_LITE_ENV", "test");
     env::set_var("DATABASE_PASSWORD", "123test");
     let config = Config::new().unwrap();
