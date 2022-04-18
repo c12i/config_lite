@@ -19,8 +19,11 @@ pub(crate) fn get_value_from_env_var<'a, T: for<'de> serde::Deserialize<'de>>(
             // handle error getting env vars
             let value = std::env::var(env_var_name)?;
             let value = serde_json::Value::String(value);
-            return Ok(serde_json::from_value(value)?);
+            Ok(serde_json::from_value(value)?)
         }
-        None => return Err(ConfigError::RegexError(value.to_string())),
+        None => {
+					let value = serde_json::Value::String(value.to_string());
+					Ok(serde_json::from_value(value)?)
+				},
     }
 }
