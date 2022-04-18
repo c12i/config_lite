@@ -1,3 +1,4 @@
+use std::env::VarError;
 use std::io;
 
 use thiserror::Error;
@@ -16,6 +17,10 @@ pub enum ConfigError {
     UnsupportedFileTypeError(String),
     #[error("No value could be found for key `{0}`")]
     ValueError(String),
+    #[error("Error reading configuration from env var: {0}")]
+    EnvVarError(#[from] VarError),
+    #[error("No matches invalid environmental variable interpolation: {0}")]
+    RegexError(String),
     #[error("error: {0}")]
     Other(#[from] anyhow::Error),
 }
