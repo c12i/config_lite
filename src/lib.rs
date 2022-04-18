@@ -26,12 +26,10 @@ pub enum FileType {
 }
 
 impl TryFrom<PathBuf> for FileType {
-    // TODO: Replace with custom error type
     type Error = ConfigError;
 
     fn try_from(p: PathBuf) -> Result<Self, Self::Error> {
         if let Some(s) = p.extension() {
-            // TODO: Handle error
             let s = s
                 .to_str()
                 .ok_or_else(|| ConfigError::Other(anyhow!("error converting OsStr to &str")))?;
