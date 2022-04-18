@@ -38,7 +38,7 @@ impl TryFrom<PathBuf> for FileType {
             match s {
                 "json" => Ok(FileType::Json),
                 "yaml" | "yml" => Ok(FileType::Yaml),
-                _ => Err(ConfigError::UnsupportedFileTypeError(s.to_string())),
+                _ => Err(ConfigError::UnsupportedFileTypeError(p)),
             }
         } else {
             Err(ConfigError::FileNotFoundError)
