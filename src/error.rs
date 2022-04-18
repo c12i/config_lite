@@ -22,7 +22,9 @@ pub enum ConfigError {
     EnvVarError(#[from] VarError),
     #[error("No matches invalid environmental variable interpolation: {0}")]
     RegexError(String),
-    #[error("The string path `{0}` you provided is invald, please use a `.` (period) delimited string")]
+    #[error(
+        "The string path `{0}` you provided is invald, please use a `.` (period) delimited string"
+    )]
     InvalidStringPathError(String),
     #[error("error: {0}")]
     Other(#[from] anyhow::Error),

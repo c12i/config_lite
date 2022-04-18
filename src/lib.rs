@@ -82,7 +82,7 @@ impl Config {
     pub fn get<'a, T: for<'de> serde::Deserialize<'de>>(&self, s: &'a str) -> ConfigResult<T> {
         let re = Regex::new(r"^[0-9a-zA-Z]+(\.[0-9a-zA-Z]+)*$").unwrap();
         if !re.is_match(s) {
-            return Err(ConfigError::InvalidStringPathError(s.to_string()))
+            return Err(ConfigError::InvalidStringPathError(s.to_string()));
         }
         match self.filetype {
             FileType::Json => parse_json(&self.file_content, s),
