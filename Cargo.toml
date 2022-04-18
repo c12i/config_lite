@@ -1,7 +1,13 @@
 [package]
-name = "config_lite"
-version = "1.0.0-beta"
+authors = ["Collins Muriuki <hello@collinsmuriuki.xyz>"]
+description = "A lightweight and customizable configuration management library for binary crates"
 edition = "2018"
+keywords = ["config", "configurations"]
+license = "MIT"
+name = "config_lite"
+readme = "README.md"
+repository = "https://github.com/collinsmuriuki/config_lite"
+version = "1.0.0-beta"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
