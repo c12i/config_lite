@@ -21,6 +21,9 @@ Given the following json config file:
       "screen_name": "foo_baz",
       "isActive": true
     }
+  },
+  "database": {
+    "password": "{{DATABASE_PASSWORD}}" // config will read this value from the env var $DATABASE_PASSWORD
   }
 }
 ```
@@ -42,6 +45,7 @@ struct User {
 
 let config = Config::new()?;
 
-let value = config.get<String>("foo")?;
-let user = config.get<User>("test.user")?;
+let value = config.get::<String>("foo")?;
+let user = config.get::<User>("test.user")?;
+let database_password = config.get::<String>("database.password")?;
 ```
