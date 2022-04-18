@@ -1,7 +1,7 @@
 use std::env;
 
-use regex::Regex;
 use crate::{ConfigError, ConfigResult};
+use regex::Regex;
 
 pub fn parse_json<'a, T: for<'de> serde::Deserialize<'de>>(
     file_content: &str,
@@ -13,7 +13,7 @@ pub fn parse_json<'a, T: for<'de> serde::Deserialize<'de>>(
     for s in string_path_vec {
         current_value = current_value
             .get(s)
-            .ok_or_else(|| ConfigError::ValueError)?;
+            .ok_or_else(|| ConfigError::ValueError(current_value.to_string()))?;
     }
     // check if current value is a string and if the string matches a {{}} regex pattern
     if current_value.is_string() {
@@ -28,8 +28,11 @@ pub fn parse_json<'a, T: for<'de> serde::Deserialize<'de>>(
                 let value = env::var(env_var_name).unwrap();
                 let value = serde_json::Value::String(value);
                 return Ok(serde_json::from_value(value)?);
-            },
-            None => {/*TODO: return Err */ unimplemented!()}
+            }
+            None => {
+                /*TODO: return Err */
+                unimplemented!()
+            }
         }
     }
     Ok(serde_json::from_value(current_value.to_owned())?)

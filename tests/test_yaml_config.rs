@@ -41,6 +41,6 @@ fn get_value_from_yaml_config_file() {
 #[test]
 fn get_array_values_from_yaml_config_file() {
     let config = Config::new().unwrap();
-    let values = config.get::<[i32;2]>("array").unwrap();
-    assert_eq!([2,1], values);
+    let values = config.get::<[i32; 2]>("array").unwrap();
+    assert_eq!([2, 1], values);
 }
