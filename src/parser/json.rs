@@ -1,9 +1,8 @@
-use std::env;
-
 use crate::{ConfigError, ConfigResult};
-use regex::Regex;
 
-pub fn parse_json<'a, T: for<'de> serde::Deserialize<'de>>(
+use super::get_value_from_env_var;
+
+pub(crate) fn parse_json<'a, T: for<'de> serde::Deserialize<'de>>(
     file_content: &str,
     string_path: &str,
 ) -> ConfigResult<T> {
@@ -15,24 +14,9 @@ pub fn parse_json<'a, T: for<'de> serde::Deserialize<'de>>(
             .get(s)
             .ok_or_else(|| ConfigError::ValueError(current_value.to_string()))?;
     }
-    // check if current value is a string and if the string matches a {{}} regex pattern
     if current_value.is_string() {
         if let Some(value_string) = current_value.as_str() {
-            // not expected to fail
-            let re = Regex::new(r"\{\{(\w+)\}\}").unwrap();
-            match re.captures(value_string) {
-                Some(c) => {
-                    let env_var_name = c
-                        .get(1)
-                        .ok_or_else(|| ConfigError::RegexError(value_string.to_string()))?
-                        .as_str();
-                    // handle error getting env vars
-                    let value = env::var(env_var_name)?;
-                    let value = serde_json::Value::String(value);
-                    return Ok(serde_json::from_value(value)?);
-                },
-                None => return Err(ConfigError::RegexError(value_string.to_string()))
-            }
+           return get_value_from_env_var(value_string);
         }
     }
     Ok(serde_json::from_value(current_value.to_owned())?)
