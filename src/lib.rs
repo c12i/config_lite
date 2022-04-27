@@ -46,7 +46,7 @@ impl TryFrom<PathBuf> for FileType {
 }
 
 impl Config {
-    pub fn new() -> ConfigResult<Self> {
+    pub fn init() -> ConfigResult<Self> {
         let filename = get_current_configuration_environment();
         let config_path = get_config_path();
         let res = std::fs::read_dir(config_path)?

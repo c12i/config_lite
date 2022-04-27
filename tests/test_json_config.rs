@@ -5,7 +5,7 @@ use std::env;
 #[test]
 fn json_file_content_is_saved_into_config_struct() {
     env::set_var("CONFIG_LITE_ENV", "test");
-    let config = Config::new().unwrap();
+    let config = Config::init().unwrap();
     let actual_file_content = std::fs::read_to_string("./config/test.json").unwrap();
     assert_eq!(config.file_content, actual_file_content);
     env::remove_var("CONFIG_LITE_ENV")
@@ -15,7 +15,7 @@ fn json_file_content_is_saved_into_config_struct() {
 #[should_panic]
 fn invalid_string_path_results_in_an_error() {
     env::set_var("CONFIG_LITE_ENV", "test");
-    let config = Config::new().unwrap();
+    let config = Config::init().unwrap();
     let _ = config.get::<String>("test:user:name").unwrap();
     env::remove_var("CONFIG_LITE_ENV");
 }
@@ -32,7 +32,7 @@ struct User {
 #[test]
 fn get_value_from_json_config_file() {
     env::set_var("CONFIG_LITE_ENV", "test");
-    let config = Config::new().unwrap();
+    let config = Config::init().unwrap();
     let val = config.get::<String>("foo").unwrap();
     assert_eq!(val, "bar".to_string());
 
@@ -56,7 +56,7 @@ fn get_value_from_json_config_file() {
 fn get_json_configuration_value_from_env_var() {
     env::set_var("CONFIG_LITE_ENV", "test");
     env::set_var("DATABASE_PASSWORD", "123test");
-    let config = Config::new().unwrap();
+    let config = Config::init().unwrap();
     let val = config.get::<String>("database.password").unwrap();
     println!("config password ==> {}", val);
     assert_eq!(val, "123test".to_string());

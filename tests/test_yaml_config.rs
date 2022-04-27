@@ -5,7 +5,7 @@ use serde::Deserialize;
 
 #[test]
 fn yaml_file_content_is_saved_into_config_struct() {
-    let config = Config::new().unwrap();
+    let config = Config::init().unwrap();
     let actual_file_content = std::fs::read_to_string("./config/default.yaml").unwrap();
     assert_eq!(config.file_content, actual_file_content);
 }
@@ -21,7 +21,7 @@ struct User {
 
 #[test]
 fn get_value_from_yaml_config_file() {
-    let config = Config::new().unwrap();
+    let config = Config::init().unwrap();
     let val = config.get::<String>("foo").unwrap();
     assert_eq!(val, "bar".to_string());
 
@@ -42,7 +42,7 @@ fn get_value_from_yaml_config_file() {
 
 #[test]
 fn get_array_values_from_yaml_config_file() {
-    let config = Config::new().unwrap();
+    let config = Config::init().unwrap();
     let values = config.get::<[i32; 2]>("array").unwrap();
     assert_eq!([2, 1], values);
 }
@@ -50,7 +50,7 @@ fn get_array_values_from_yaml_config_file() {
 #[test]
 fn get_yaml_configuration_value_from_env_var() {
     env::set_var("DATABASE_PASSWORD", "123test");
-    let config = Config::new().unwrap();
+    let config = Config::init().unwrap();
     let val = config.get::<String>("database.password").unwrap();
     println!("config password ==> {}", val);
     assert_eq!(val, "123test".to_string());

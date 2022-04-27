@@ -43,7 +43,7 @@ struct User {
   is_active: bool,
 }
 
-let config = Config::new()?;
+let config = Config::init()?;
 
 let value = config.get::<String>("foo")?;
 let user = config.get::<User>("test.user")?;
