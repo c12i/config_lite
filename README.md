@@ -1,15 +1,26 @@
 # config_lite
 
-A lightweight and customizable configuration management library for binary crates. Inspired by [node config](https://www.npmjs.com/package/config)
+This lightweight and customizable Rust library provides a simple configuration file parser that can read 
+JSON and YAML files as well as referencing environment variables defined in the config file.
 
-### Caveats
-The values read from the configuration files must be owned, meaning they cannot be deserialized with [serde](https://github.com/serde-rs/serde) into reference types
+It defines a Config struct that represents a configuration file and provides methods for initializing and retrieving values from it.
 
-Still a work in progress
+Inspired by [node config](https://www.npmjs.com/package/config)
 
-## Example
+## Installation
 
-Given the following json config file:
+You can add this library to your project by adding the following to your Cargo.toml file:
+
+```toml
+[dependencies]
+config_lite = "2.0.0-beta"
+```
+
+## Usage
+
+To use the Config struct, you can import it and call its methods as follows, 
+given the configuration json file below in `config/default.json` at the root dir of your
+project:
 
 ```json
 {
@@ -28,9 +39,7 @@ Given the following json config file:
 }
 ```
 
-The configurations can be read like so:
-
-```rust
+```rs
 use config::Config;
 use serde::Deserialize;
 
@@ -49,3 +58,30 @@ let value = config.get::<String>("foo")?;
 let user = config.get::<User>("test.user")?;
 let database_password = config.get::<String>("database.password")?;
 ```
+
+The `init()` method initializes the Config object by searching for the configuration file in 
+the file system and reading its contents. 
+
+The `get()` method retrieves a value from the configuration file given a string path, delimited
+with a period `.`.
+
+## Customization
+Some attributes of the library can be customized by the user:
+
+1. The config environment which will determine which config file to read from can be set via the 
+`CONFIG_LITE_ENV` env var. The default environment is `default`. Which expects at the very least
+a `default.json` or `default.yaml` config file to exist in the config directory
+2. The config directory name can be customized by changing the `CONFIG_LITE_DIRECTORY_NAME`
+env var. The default directory name is `config` and is expected to be defined at the root
+dir of your crate.
+
+## Caveats
+The values from the config type must be mapped to owned types and not shared types.
+
+## License
+This library is released under the MIT License. See the LICENSE file for more information.
+
+## Contributing
+I am still open to build upon this library, currently what is out is a proof of concept.
+If you would like to contribute to this project, 
+feel free to open a pull request or issue on the [GitHub repository](https://github.com/collinsmuriuki/config_lite).
