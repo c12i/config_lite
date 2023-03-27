@@ -14,13 +14,13 @@ use utils::{get_config_path, get_current_configuration_environment};
 
 type ConfigResult<T> = Result<T, ConfigError>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Config {
     pub(crate) filetype: FileType,
     pub file_content: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum FileType {
     Json,
     Yaml,
