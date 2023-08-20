@@ -1,5 +1,7 @@
+#![doc = include_str!("../README.md")]
+
 use anyhow::anyhow;
-use regex::Regex;
+use fancy_regex::Regex;
 use std::convert::TryFrom;
 use std::path::PathBuf;
 
@@ -57,18 +59,16 @@ impl Config {
                     .unwrap()
                     .file_name()
                     .into_string()
-                    .unwrap_or_else(|_| "".to_string())
-                    .split(".")
+                    .unwrap_or("".into())
+                    .split('.')
                     .next()
-                    .unwrap_or_else(|| "")
+                    .unwrap_or("")
                     .to_owned();
                 value == filename
             })
-            .map(|v| v)
             .collect::<Vec<_>>();
         let config_file_path = res
-            .iter()
-            .next()
+            .first()
             .ok_or_else(|| ConfigError::FileNotFoundError)?
             .as_ref()
             .map_err(|_| ConfigError::FileNotFoundError)?
@@ -80,8 +80,8 @@ impl Config {
     }
 
     pub fn get<'a, T: for<'de> serde::Deserialize<'de>>(&self, s: &'a str) -> ConfigResult<T> {
-        let re = Regex::new(r"^[0-9a-zA-Z]+(\.[0-9a-zA-Z]+)*$").unwrap();
-        if !re.is_match(s) {
+        let re = Regex::new(r"^(?!.*\.{2,})(?!\S*\.$)\S+(\.\S+)*$").unwrap();
+        if re.is_match(s).is_err() {
             return Err(ConfigError::InvalidStringPathError(s.to_string()));
         }
         match self.filetype {
