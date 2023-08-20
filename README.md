@@ -13,7 +13,7 @@ You can add this library to your project by adding the following to your Cargo.t
 
 ```toml
 [dependencies]
-config_lite = "2.0.0-beta"
+config_lite = "2.1.0-beta"
 ```
 
 ## Usage
