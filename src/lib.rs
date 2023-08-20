@@ -1,3 +1,5 @@
+#![doc = include_str!("../README.md")]
+
 use anyhow::anyhow;
 use regex::Regex;
 use std::convert::TryFrom;
@@ -80,7 +82,7 @@ impl Config {
     }
 
     pub fn get<'a, T: for<'de> serde::Deserialize<'de>>(&self, s: &'a str) -> ConfigResult<T> {
-        let re = Regex::new(r"^[0-9a-zA-Z]+(\.[0-9a-zA-Z]+)*$").unwrap();
+        let re = Regex::new(r"^(?!.*\.{2,})(?!\S*\.$)\S+(\.\S+)*$").unwrap();
         if !re.is_match(s) {
             return Err(ConfigError::InvalidStringPathError(s.to_string()));
         }
