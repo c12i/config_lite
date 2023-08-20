@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 
 use anyhow::anyhow;
-use regex::Regex;
+use fancy_regex::Regex;
 use std::convert::TryFrom;
 use std::path::PathBuf;
 
@@ -81,7 +81,7 @@ impl Config {
 
     pub fn get<'a, T: for<'de> serde::Deserialize<'de>>(&self, s: &'a str) -> ConfigResult<T> {
         let re = Regex::new(r"^(?!.*\.{2,})(?!\S*\.$)\S+(\.\S+)*$").unwrap();
-        if !re.is_match(s) {
+        if re.is_match(s).is_err() {
             return Err(ConfigError::InvalidStringPathError(s.to_string()));
         }
         match self.filetype {
