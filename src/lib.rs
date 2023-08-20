@@ -59,18 +59,16 @@ impl Config {
                     .unwrap()
                     .file_name()
                     .into_string()
-                    .unwrap_or_else(|_| "".to_string())
-                    .split(".")
+					.unwrap_or("".into())
+                    .split('.')
                     .next()
-                    .unwrap_or_else(|| "")
+					.unwrap_or("")
                     .to_owned();
                 value == filename
             })
-            .map(|v| v)
             .collect::<Vec<_>>();
         let config_file_path = res
-            .iter()
-            .next()
+			.first()
             .ok_or_else(|| ConfigError::FileNotFoundError)?
             .as_ref()
             .map_err(|_| ConfigError::FileNotFoundError)?
