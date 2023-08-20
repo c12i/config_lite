@@ -16,7 +16,7 @@ pub(crate) fn parse_yaml<'a, T: for<'de> serde::Deserialize<'de>>(
     }
     if current_value.is_string() {
         if let Some(value_string) = current_value.as_str() {
-           return get_value_from_env_var(value_string);
+            return get_value_from_env_var(value_string);
         }
     }
     Ok(serde_yaml::from_value(current_value.to_owned())?)

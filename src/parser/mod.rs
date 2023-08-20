@@ -22,8 +22,8 @@ pub(crate) fn get_value_from_env_var<'a, T: for<'de> serde::Deserialize<'de>>(
             Ok(serde_json::from_value(value)?)
         }
         None => {
-					let value = serde_json::Value::String(value.to_string());
-					Ok(serde_json::from_value(value)?)
-				},
+            let value = serde_json::Value::String(value.to_string());
+            Ok(serde_json::from_value(value)?)
+        }
     }
 }
