@@ -51,10 +51,9 @@ impl Config {
     pub fn init() -> ConfigResult<Self> {
         let filename = get_current_configuration_environment();
         let config_path = get_config_path();
-        let res = std::fs::read_dir(config_path)?
-            .filter(|d| {
-                // TODO: Prefarably use a fallible iterator
-                let value = d
+        let matching_entry = std::fs::read_dir(config_path)?
+            .find(|entry| {
+                let value = entry
                     .as_ref()
                     .unwrap()
                     .file_name()
@@ -66,16 +65,12 @@ impl Config {
                     .to_owned();
                 value == filename
             })
-            .collect::<Vec<_>>();
-        let config_file_path = res
-            .first()
-            .ok_or_else(|| ConfigError::FileNotFoundError)?
-            .as_ref()
-            .map_err(|_| ConfigError::FileNotFoundError)?
-            .path();
+            .ok_or(ConfigError::FileNotFoundError)??;
+        let config_file_path = matching_entry.path();
+        let file_content = std::fs::read_to_string(&config_file_path)?;
         Ok(Config {
             filetype: FileType::try_from(config_file_path.to_owned())?,
-            file_content: std::fs::read_to_string(config_file_path)?,
+            file_content,
         })
     }
 
